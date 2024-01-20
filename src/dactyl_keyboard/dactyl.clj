@@ -20,7 +20,7 @@
 (def β (/ π 36))                        ; curvature of the rows
 (def centerrow (- nrows 3))             ; controls front-back tilt
 (def centercol 4)                       ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (/ π 7))            ; or, change this for more precise tenting control
+(def tenting-angle (/ π 8))             ; or, change this for more precise tenting control
 (def column-style
   (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
@@ -32,7 +32,7 @@
 
 (def thumb-offsets [6 -3 -6])
 
-(def keyboard-z-offset 14)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 16)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.8)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.0)                  ; original= 0.5
@@ -583,17 +583,8 @@
   ))
 
 
-(def rj9-start  (map + [0 -3  0] (key-position 0 0 (map + (wall-locate3 0 1) [0 (/ mount-height  2) 0]))))
-(def rj9-position  [(first rj9-start) (second rj9-start) 11])
-(def rj9-cube   (cube 14.78 13 22.38))
-(def rj9-space  (translate rj9-position rj9-cube))
-(def rj9-holder (translate rj9-position
-                  (difference rj9-cube
-                              (union (translate [0 2 0] (cube 10.78  9 18.38))
-                                     (translate [0 0 5] (cube 10.78 13  5))))))
-
-(def usb-holder-position (key-position 1 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
-(def usb-holder-size [6.5 10.0 13.6])
+(def usb-holder-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+(def usb-holder-size [13.6 10.0 6.5])
 (def usb-holder-thickness 4)
 (def usb-holder
     (->> (cube (+ (first usb-holder-size) usb-holder-thickness) (second usb-holder-size) (+ (last usb-holder-size) usb-holder-thickness))
@@ -611,8 +602,10 @@
 (def teensy-holder-height (+ 6 teensy-width))
 (def teensy-offset-height 5)
 (def teensy-holder-top-length 18)
-(def teensy-top-xy (key-position 0 (- centerrow 1) (wall-locate3 -1 0)))
-(def teensy-bot-xy (key-position 0 (+ centerrow 1) (wall-locate3 -1 0)))
+; (def teensy-top-xy (key-position 0 (- centerrow 1) (wall-locate3 -1 0)))
+; (def teensy-bot-xy (key-position 0 (+ centerrow 1) (wall-locate3 -1 0)))
+(def teensy-top-xy (key-position 0 (- centerrow 1) (wall-locate3 -0.6 0)))
+(def teensy-bot-xy (key-position 0 (+ centerrow 1) (wall-locate3 -0.6 0)))
 (def teensy-holder-length (- (second teensy-top-xy) (second teensy-bot-xy)))
 (def teensy-holder-offset (/ teensy-holder-length -2))
 (def teensy-holder-top-offset (- (/ teensy-holder-top-length 2) teensy-holder-length))
@@ -630,7 +623,8 @@
                (translate [(+ (/ teensy-pcb-thickness 2) 3) teensy-holder-top-offset (+ 1.5 (/ teensy-width 2))]))
           (->> (cube 4 teensy-holder-top-length 4)
                (translate [(+ teensy-pcb-thickness 5) teensy-holder-top-offset (+ 1 (/ teensy-width 2))])))
-        (translate [(- teensy-holder-width) 0 0])
+        ; (translate [(- teensy-holder-width) 0 0])
+        (translate [(- teensy-holder-width) 0 7])
         (translate [-1.4 0 0])
         (translate [(first teensy-top-xy)
                     (- (second teensy-top-xy) 1)
@@ -646,10 +640,10 @@
         shift-left    (= column 0)
         shift-up      (and (not (or shift-right shift-left)) (= row 0))
         shift-down    (and (not (or shift-right shift-left)) (>= row lastrow))
-        position      (if shift-up     (key-position column row (map + (wall-locate2  0  1) [0 (/ mount-height 2) 0]))
-                       (if shift-down  (key-position column row (map - (wall-locate2  0 -1) [0 (/ mount-height 2) 0]))
-                        (if shift-left (map + (left-key-position row 0) (wall-locate3 -1 0))
-                                       (key-position column row (map + (wall-locate2  1  0) [(/ mount-width 2) 0 0])))))
+        position      (if shift-up     (key-position column row (map + (wall-locate2  0  0.6) [0 (/ mount-height 2) 0]))
+                       (if shift-down  (key-position column row (map - (wall-locate2  0 -0.35) [0 (/ mount-height 2) 0]))
+                        (if shift-left (map + (left-key-position row 0) (wall-locate3 -0.55 0))
+                                       (key-position column row (map + (wall-locate2  0.59  0) [(/ mount-width 2) 0 0])))))
         ]
     (->> (screw-insert-shape bottom-radius top-radius height)
          (translate [(first position) (second position) (/ height 2)])
@@ -669,27 +663,27 @@
 (def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.6) (+ screw-insert-top-radius 1.6) (+ screw-insert-height 1.5)))
 (def screw-insert-screw-holes  (screw-insert-all-shapes 1.7 1.7 350))
 
-; (def wire-post-height 7)
-; (def wire-post-overhang 3.5)
-; (def wire-post-diameter 2.6)
-; (defn wire-post [direction offset]
-;    (->> (union (translate [0 (* wire-post-diameter -0.5 direction) 0] (cube wire-post-diameter wire-post-diameter wire-post-height))
-;                (translate [0 (* wire-post-overhang -0.5 direction) (/ wire-post-height -2)] (cube wire-post-diameter wire-post-overhang wire-post-diameter)))
-;         (translate [0 (- offset) (+ (/ wire-post-height -2) 3) ])
-;         (rotate (/ α -2) [1 0 0])
-;         (translate [3 (/ mount-height -2) 0])))
-; 
-; (def wire-posts
-;   (union
-;      (thumb-ml-place (translate [-5 0 -2] (wire-post  1 0)))
-;      (thumb-ml-place (translate [ 0 0 -2.5] (wire-post -1 6)))
-;      (thumb-ml-place (translate [ 5 0 -2] (wire-post  1 0)))
-;      (for [column (range 0 lastcol)
-;            row (range 0 cornerrow)]
-;        (union
-;         (key-place column row (translate [-5 0 0] (wire-post 1 0)))
-;         (key-place column row (translate [0 0 0] (wire-post -1 6)))
-;         (key-place column row (translate [5 0 0] (wire-post  1 0)))))))
+(def wire-post-height 7)
+(def wire-post-overhang 3.5)
+(def wire-post-diameter 2.6)
+(defn wire-post [direction offset]
+   (->> (union (translate [0 (* wire-post-diameter -0.5 direction) 0] (cube wire-post-diameter wire-post-diameter wire-post-height))
+               (translate [0 (* wire-post-overhang -0.5 direction) (/ wire-post-height -2)] (cube wire-post-diameter wire-post-overhang wire-post-diameter)))
+        (translate [0 (- offset) (+ (/ wire-post-height -2) 3) ])
+        (rotate (/ α -2) [1 0 0])
+        (translate [3 (/ mount-height -2) 0])))
+
+(def wire-posts
+  (union
+     (thumb-ml-place (translate [-5 0 -2] (wire-post  1 0)))
+     (thumb-ml-place (translate [ 0 0 -2.5] (wire-post -1 6)))
+     (thumb-ml-place (translate [ 5 0 -2] (wire-post  1 0)))
+     (for [column (range 0 lastcol)
+           row (range 0 cornerrow)]
+       (union
+        (key-place column row (translate [-5 0 0] (wire-post 1 0)))
+        (key-place column row (translate [0 0 0] (wire-post -1 6)))
+        (key-place column row (translate [5 0 0] (wire-post  1 0)))))))
 
 
 (def model-right (difference
@@ -702,10 +696,8 @@
                                        screw-insert-outers
                                        teensy-holder)
                                        ; usb-holder)
-                                ; rj9-space
                                 usb-holder-hole
                                 screw-insert-holes)
-                    ; rj9-holder
                     ; wire-posts
                     ; thumbcaps
                     ; caps
@@ -730,15 +722,12 @@
                     thumbcaps
                     caps
                     teensy-holder
-                    ; rj9-holder
-                    ; usb-holder-hole
                     ; usb-holder-hole
                     ; ; teensy-holder-hole
                     ;             screw-insert-outers
                     ;             teensy-screw-insert-holes
                     ;             teensy-screw-insert-outers
                     ;             usb-cutout
-                    ;             rj9-space
                                 ; wire-posts
                   )))
 
@@ -748,7 +737,6 @@
                      (translate [0 0 -0.1]
                        (difference (union case-walls
                                           teensy-holder
-                                          ; rj9-holder
                                           screw-insert-outers)
                                    (translate [0 0 -10] screw-insert-screw-holes))
                   ))))
