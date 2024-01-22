@@ -583,15 +583,51 @@
   ))
 
 
-(def usb-holder-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+; TODO: make sure there is enough room for screws
+(def usb-holder-position (key-position 0.9 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+; TODO: resize?
 (def usb-holder-size [13.6 10.0 6.5])
 (def usb-holder-thickness 4)
 (def usb-holder
     (->> (cube (+ (first usb-holder-size) usb-holder-thickness) (second usb-holder-size) (+ (last usb-holder-size) usb-holder-thickness))
-         (translate [(first usb-holder-position) (second usb-holder-position) (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
+         (translate [(first usb-holder-position)
+                     (second usb-holder-position)
+                     (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
 (def usb-holder-hole
     (->> (apply cube usb-holder-size)
-         (translate [(first usb-holder-position) (second usb-holder-position) (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
+         (translate [(first usb-holder-position)
+                     (second usb-holder-position)
+                     (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
+
+(def trrs-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+; TODO: resize?
+(def trrs-size [3 20])
+(def trrs-hole
+  (->> (apply cylinder trrs-size)
+       (rotate (deg2rad 90) [1 0 0])
+       (translate [(- (first trrs-position) 8)
+                   (second trrs-position)
+                   (/ (last trrs-size) 3.7)])))
+
+(def reset-btn-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+; TODO: resize?
+(def reset-btn-size [3 20])
+(def reset-btn-hole
+    (->> (apply cylinder reset-btn-size)
+         (rotate (deg2rad 90) [1 0 0])
+         (translate [(+ (first reset-btn-position) 2)
+                     (second reset-btn-position)
+                     (/ (last reset-btn-size) 1.3)])))
+
+(def led-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+; TODO: resize?
+(def led-size [3 20])
+(def led-hole
+    (->> (apply cylinder led-size)
+         (rotate (deg2rad 90) [1 0 0])
+         (translate [(- (first led-position) 8)
+                     (second led-position)
+                     (/ (last led-size) 1.3)])))
 
 (def teensy-width 20)
 (def teensy-height 12)
@@ -697,6 +733,9 @@
                                        teensy-holder)
                                        ; usb-holder)
                                 usb-holder-hole
+                                trrs-hole
+                                reset-btn-hole
+                                led-hole
                                 screw-insert-holes)
                     ; wire-posts
                     ; thumbcaps
