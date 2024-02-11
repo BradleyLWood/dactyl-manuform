@@ -20,7 +20,7 @@
 (def β (/ π 36))                        ; curvature of the rows
 (def centerrow (- nrows 3))             ; controls front-back tilt
 (def centercol 4)                       ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (/ π 8))             ; or, change this for more precise tenting control
+(def tenting-angle (/ π 10))             ; or, change this for more precise tenting control
 (def column-style
   (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
@@ -583,51 +583,44 @@
   ))
 
 
-; TODO: make sure there is enough room for screws
-(def usb-holder-position (key-position 0.9 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
-; TODO: resize?
-(def usb-holder-size [13.6 10.0 6.5])
-(def usb-holder-thickness 4)
-(def usb-holder
-    (->> (cube (+ (first usb-holder-size) usb-holder-thickness) (second usb-holder-size) (+ (last usb-holder-size) usb-holder-thickness))
-         (translate [(first usb-holder-position)
-                     (second usb-holder-position)
-                     (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
-(def usb-holder-hole
-    (->> (apply cube usb-holder-size)
-         (translate [(first usb-holder-position)
-                     (second usb-holder-position)
-                     (/ (+ (last usb-holder-size) usb-holder-thickness) 2)])))
+(def hole-cluster-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
 
-(def trrs-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
-; TODO: resize?
-(def trrs-size [3 20])
-(def trrs-hole
-  (->> (apply cylinder trrs-size)
-       (rotate (deg2rad 90) [1 0 0])
-       (translate [(- (first trrs-position) 8)
-                   (second trrs-position)
-                   (/ (last trrs-size) 3.7)])))
+(def usb-holder-size [10.5 5.0 25.4]) ; vertical
+;(def usb-holder-size [25.4 5.0 10.5]) ; horizontal
+(def usb-hole-size [10.5 10.0 12.2]) ; vertical
+; (def usb-hole-size [13.6 10.0 6.5]) ; horizontal
+(def usb-hole-hole
+    (->> (apply cube usb-hole-size)
+         (translate [(+ (first hole-cluster-position) 8) ; left/right
+                     (second hole-cluster-position)
+                     ;(/ (last usb-hole-size) 2)]))) ; up/down
+                     (+ (/ (last usb-holder-size) 2) 2)]))) ; up/down
 
-(def reset-btn-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
-; TODO: resize?
-(def reset-btn-size [3 20])
-(def reset-btn-hole
-    (->> (apply cylinder reset-btn-size)
-         (rotate (deg2rad 90) [1 0 0])
-         (translate [(+ (first reset-btn-position) 2)
-                     (second reset-btn-position)
-                     (/ (last reset-btn-size) 1.3)])))
-
-(def led-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
-; TODO: resize?
-(def led-size [3 20])
+(def led-size [(/ 7.9 2) 20])
 (def led-hole
     (->> (apply cylinder led-size)
          (rotate (deg2rad 90) [1 0 0])
-         (translate [(- (first led-position) 8)
-                     (second led-position)
-                     (/ (last led-size) 1.3)])))
+         (translate [(- (first hole-cluster-position) 8) ; left/right
+                     (second hole-cluster-position)
+                     (+ (/ (last led-size) 2) 18)]))) ; up/down
+
+(def reset-btn-size [(/ 6.7 2) 20])
+(def reset-btn-hole
+  (->> (apply cylinder reset-btn-size)
+       (rotate (deg2rad 90) [1 0 0])
+       (translate [(- (first hole-cluster-position) 8) ; left/right
+                   (second hole-cluster-position)
+                   (+ (/ (last reset-btn-size) 2) 6)]))) ; up/down
+
+; (def trrs-position (key-position 0.6 0 (map + (wall-locate2 0 1) [0 (/ mount-height 2) 0])))
+; TODO: resize?
+(def trrs-size [(/ 5 2) 20])
+(def trrs-hole
+  (->> (apply cylinder trrs-size)
+       (rotate (deg2rad 90) [1 0 0])
+       (translate [(- (first hole-cluster-position) 8) ; left/right
+                   (second hole-cluster-position)
+                   (- (/ (last trrs-size) 2) 4)]))) ; up/down
 
 (def teensy-width 20)
 (def teensy-height 12)
@@ -731,8 +724,7 @@
                     (difference (union case-walls
                                        screw-insert-outers
                                        teensy-holder)
-                                       ; usb-holder)
-                                usb-holder-hole
+                                usb-hole-hole
                                 trrs-hole
                                 reset-btn-hole
                                 led-hole
@@ -761,7 +753,6 @@
                     thumbcaps
                     caps
                     teensy-holder
-                    ; usb-holder-hole
                     ; ; teensy-holder-hole
                     ;             screw-insert-outers
                     ;             teensy-screw-insert-holes
@@ -780,9 +771,9 @@
                                    (translate [0 0 -10] screw-insert-screw-holes))
                   ))))
 
-(spit "things/test.scad"
-      (write-scad
-         (difference usb-holder usb-holder-hole)))
+;(spit "things/test.scad"
+;      (write-scad
+;         (usb-hole))
 
 
 
