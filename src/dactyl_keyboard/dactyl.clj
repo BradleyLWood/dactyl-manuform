@@ -458,7 +458,7 @@
 (defn bottom-hull [& p]
   (hull p (bottom 0.001 p)))
 
-(def left-wall-x-offset 10)
+(def left-wall-x-offset 15)
 (def left-wall-z-offset  3)
 
 (defn left-key-position [row direction]
@@ -638,8 +638,8 @@
       (->> (cube 4 teensy-holder-top-length 4)
            (translate [(+ teensy-pcb-thickness 5) teensy-holder-top-offset (+ 1 (/ teensy-width 2))])))
     ; (translate [(- teensy-holder-width) 0 0])
-    (translate [(- teensy-holder-width) 0 7])
-    (translate [-1.4 0 0])
+    (translate [(- teensy-holder-width) 0 5])
+    (translate [-8 0 0])
     (translate [(first teensy-top-xy)
                 (- (second teensy-top-xy) 1)
                 (/ (+ 6 teensy-width) 2)])))
@@ -661,7 +661,7 @@
 
 (defn screw-insert-all-shapes [radius height]
   (union (screw-insert 0 0         radius height)
-         (screw-insert 0 (- lastrow 0.6)   radius height)
+         (screw-insert 0 (- lastrow 0.9)   radius height)
          (screw-insert 2 (+ lastrow 0.35)  radius height)
          (screw-insert 3 0         radius height)
          (screw-insert lastcol 1   radius height)))
